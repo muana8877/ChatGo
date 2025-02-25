@@ -3,6 +3,8 @@
     border-right: 1px solid rgba(255, 255, 255, 0.527);
     border-left: 1px solid rgba(255, 255, 255, 0.527);
     height: 100%;
+    display: flex;
+    flex-direction: column;
 
     .top{
         padding: 20px;
@@ -49,5 +51,109 @@
                 height: 20px;
             }
         }
+    }
+    .center{
+        padding: 10px 20px;
+        flex: 1;
+        overflow: scroll;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+
+        .message{
+            max-width: 70%;
+            display: flex;
+            gap: 20px;
+
+            &.own{
+                align-self: flex-end;
+
+                .texts{
+                    p{
+                        background-color: #5183fe;
+                    }
+                }
+            }
+
+            img{
+                width: 30px;
+                height: 30px;
+                object-fit: cover;
+                border-radius: 50%;
+            }
+            .texts{
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+
+                img{
+                    width: 100%;
+                    height: 300px;
+                    object-fit: cover;
+                    border-radius: 10px;
+                }
+
+                p{
+                    padding: 5px 10px;
+                    background-color: rgba(17, 25, 40, 0.3);
+                    border-radius: 10px;
+                }
+
+                span{
+                    font-size: 13px;
+                }
+            }
+        }
+    }
+    .center::-webkit-scrollbar{
+        display: none;
+    }
+    .bottom{
+        display: flex;
+        align-items: center;
+        padding: 10px 20px;
+        justify-content: space-between;
+        gap: 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.527);
+
+        .icons{
+            display: flex;
+            gap: 20px;
+        }
+        img{
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        input{
+            flex: 1;
+            background-color: rgba(3, 3, 38, 0.429);
+            border: none;
+            outline: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+        }
+
+        .emoji{
+            position: relative;
+
+            .picker{
+                position: absolute;
+                bottom: 50px;
+                left: 0;
+            }
+        }
+
+        .sendButton{
+            background-color: #5183fe;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
     }
 }
