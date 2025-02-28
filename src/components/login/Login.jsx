@@ -1,8 +1,13 @@
 import React, { useState } from "react";
 import "./login.css";
 import { toast } from "react-toastify";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import {auth, db} from "../../lib/firebase";
+import { doc, setDoc } from "firebase/firestore";
+
 
 const Login = () => {
+  const [loading, setLoading] = useState(false);
   const [avatar, setAvatar] = useState({
     file: null,
     url: "",
@@ -21,30 +26,60 @@ const Login = () => {
   //   console.log(e);
   //   toast.warn = ("Hello Warn Message")
   // };
-  const handleLogin = (e) => {
+  const handleLogin = async  (e) => {
     e.preventDefault();
+    
+    setLoading(true);
   
     // Get form data
     const formData = new FormData(e.target);
-    const email = formData.get("email");
-    const password = formData.get("password");
+    const {email, password} = Object.fromEntries(formData);
   
-    // Validation
-    if (!email || !password) {
-      toast.warn("Please fill in all fields!", {
-        position: "bottom-right", // Matches the ToastContainer position
-        autoClose: 3000, // Auto close after 3 seconds
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        theme: "light",
-      });
-      return;
+    try{
+
+      await signInWithEmailAndPassword(auth,email, password);
+      toast.success("Logged In Successfully!");
+      // Redirect to chat
+      // history.push("/");
     }
-  
-    console.log("Form submitted successfully", { email, password });
+    catch(err){
+      console.error(err);
+      toast.error(err.message);
+    }
+    finally{
+      setLoading(false);
+    }
   };
+
+  const handleRegister = async (e) =>{
+    e.preventDefault();
+
+    const formData = new FormData(e.target)
+    const {username,email,password}  = Object.fromEntries(formData);
+
+    try{
+      const res = await createUserWithEmailAndPassword(auth,email,password);
+
+      await setDoc(doc(db, "users", res.user.uid), {
+        username,
+        email,
+        id: res.user.uid,
+        blocked: [],
+      });
+
+      await setDoc(doc(db, "userchats", res.user.uid), {
+        chats: [],
+      });
+
+      toast.success("Acount created! you can Login now!");
+
+      // Redirect to chat
+      // history.push("/");
+    }catch(err){
+      console.error(err);
+      toast.error(err.message);
+    }
+  }
   
   return (
     <div className="login">
@@ -59,7 +94,7 @@ const Login = () => {
       <div className="separator"></div>
       <div className="item">
         <h2>Create an Account</h2>
-        <form onSubmit={handleLogin}>
+        <form onSubmit={handleRegister}>
           <label htmlFor="file">
             <img src={avatar.url || "./avatar.png"} alt="" />
             Upload Profile Photo
@@ -70,7 +105,7 @@ const Login = () => {
             style={{ display: "none" }}
             onChange={handelAvatar}
             />
-            <input type="text" placeholder="Username" name="usernme" />
+            <input type="text" placeholder="Username" name="username" />
             <input type="email" placeholder="Email" name="email" />
             <input type="password" placeholder="Password" name="password" />
             <button type="submit">Sign In</button>

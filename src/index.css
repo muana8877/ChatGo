@@ -21,3 +21,10 @@ body{
   border-radius: 12px;
   display: flex;
 }
+
+.loading{
+  padding: 50px;
+  font-size: 36px;
+  border-radius: 10px;
+  background-color: rgb(17, 25, 40, 0.9);
+}
