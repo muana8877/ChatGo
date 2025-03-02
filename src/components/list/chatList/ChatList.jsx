@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./chatList.css";
 import AddUser from "./addUser/AddUser";
 import { useUserStore } from "../../../lib/userStore";
-import { onSnapshot, doc, getDoc } from "firebase/firestore";
+import { onSnapshot, doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
 import { useChatStore } from "../../../lib/chatStore";
 
@@ -12,7 +12,7 @@ const ChatList = () => {
   const { currentUser } = useUserStore();
   const { chatId, changeChat } = useChatStore();
 
-  console.log(chatId)
+  console.log(chatId);
 
   useEffect(() => {
     const unSub = onSnapshot(
@@ -26,12 +26,12 @@ const ChatList = () => {
 
           const user = userDocSnap.data();
 
-          return {...item, user}; 
+          return { ...item, user };
         });
 
         const chatData = await Promise.all(promisses);
 
-        setChats(chatData.sort ((a, b) => b.updated_at - a.updated_at)); 
+        setChats(chatData.sort((a, b) => b.updated_at - a.updated_at));
       }
     );
     return () => {
@@ -40,7 +40,27 @@ const ChatList = () => {
   }, [currentUser.id]);
 
   const handleSelect = async (chat) => {
-    changeChat(chat.chatId,chat.user);
+    const userChats = chats.map((item) => {
+      const { user, ...rest } = item;
+      return rest;
+    });
+
+    const chatIndex = userChats.findIndex(
+      (item) => item.chatId === chat.chatId
+    );
+
+    userChats[chatIndex].isSeen = true;
+
+    const userChatsRef = doc(db, "userchats", currentUser.id);
+
+    try {
+      await updateDoc(userChatsRef, {
+        chats: userChats,
+      });
+      changeChat(chat.chatId, chat.user);
+    } catch (err) {
+      console.log(err);
+    }
   };
   return (
     <div className="chatList">
@@ -57,11 +77,22 @@ const ChatList = () => {
         />
       </div>
       {chats.map((chat) => (
-        <div className="item" key={chat.chatId} onClick={()=>handleSelect(chat)}>
+        <div
+          className="item"
+          key={chat.chatId}
+          onClick={() => handleSelect(chat)}
+          style={{
+            backgroundColor: chat?.isSeen ? "transparent" : "#5183fe",
+          }}
+        >
           <img src="./avatar.png" alt="" />
           <div className="texts">
             <span>{chat.user.username}</span>
-            <p>{chat.lastMessage}</p>
+            <p>
+              {chat.lastMessage.length > 25
+                ? chat.lastMessage.substring(0, 25) + "..."
+                : chat.lastMessage}
+            </p>
           </div>
         </div>
       ))}
