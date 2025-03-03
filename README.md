@@ -1,8 +1,15 @@
-# React + Vite
+# 🚀 ChatGo - Advanced Chat Application  
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+ChatGo is a **real-time chat application** built with **React** and **Firebase**, featuring **user authentication, message blocking, and emoji support** for an interactive chatting experience.  
 
-Currently, two official plugins are available:
+## 🌟 Features  
+✅ **Real-time Messaging** – Send and receive messages instantly  
+✅ **User Authentication** – Secure login and signup with Firebase Auth  
+✅ **Blocking Feature** – Block unwanted users from messaging you  
+✅ **Emoji Support** – Express yourself with a variety of emojis  
+✅ **Responsive UI** – Works seamlessly on mobile and desktop  
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🛠️ Tech Stack  
+- **Frontend:** React, Tailwind CSS  
+- **Backend & Database:** Firebase (Firestore, Authentication)  
+- **State Management:** React Context API  
