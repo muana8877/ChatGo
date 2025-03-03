@@ -8,24 +8,7 @@ import { collection, doc, getDocs, query, setDoc, where } from "firebase/firesto
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
-  const [avatar, setAvatar] = useState({
-    file: null,
-    url: "",
-  });
 
-  const handelAvatar = (e) => {
-    if (e.target.files[0]) {
-      setAvatar({
-        file: e.target.files[0],
-        url: URL.createObjectURL(e.target.files[0]),
-      });
-    }
-  };
-  // const handleLogin = (e) => {
-  //   e.preventDefault();
-  //   console.log(e);
-  //   toast.warn = ("Hello Warn Message")
-  // };
   const handleLogin = async  (e) => {
     e.preventDefault();
     
@@ -106,16 +89,6 @@ const Login = () => {
       <div className="item">
         <h2>Create an Account</h2>
         <form onSubmit={handleRegister}>
-          <label htmlFor="file">
-            <img src={avatar.url || "./avatar.png"} alt="" />
-            Upload Profile Photo
-          </label>
-          <input
-            type="file"
-            id="file"
-            style={{ display: "none" }}
-            onChange={handelAvatar}
-            />
             <input type="text" placeholder="Username" name="username" />
             <input type="email" placeholder="Email" name="email" />
             <input type="password" placeholder="Password" name="password" />

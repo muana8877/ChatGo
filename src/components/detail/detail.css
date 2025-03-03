@@ -9,12 +9,6 @@
     gap: 10px;
     border-bottom: 1px solid #dddddd35;
 
-    img {
-      width: 100px;
-      height: 100px;
-      object-fit: cover;
-      border-radius: 50%;
-    }
   }
   .info {
     padding: 10px 20px;

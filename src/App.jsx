@@ -17,6 +17,7 @@ const App = () => {
   useEffect(()=>{
     const unSub = onAuthStateChanged(auth, (user) =>{
       fetchUserInfo(user?.uid);
+      useChatStore.getState().resetChat();
     });
 
     return () =>{

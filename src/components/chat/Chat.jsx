@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import EmojiPicker from "emoji-picker-react";
 import "./chat.css";
+import { formatDistanceToNow } from "date-fns";
 import {
   arrayUnion,
   doc,
@@ -17,7 +18,8 @@ const Chat = () => {
   const [text, setText] = useState("");
 
   const { currentUser } = useUserStore();
-  const { chatId, user } = useChatStore();
+  const { chatId, user, isCurrentUserBlocked, isReceiverBlocked } =
+    useChatStore();
 
   const endRef = useRef(null);
 
@@ -83,13 +85,29 @@ const Chat = () => {
   };
 
   console.log(text);
+  const firstChar = user?.username?.charAt(0).toUpperCase() || "?";
   return (
     <div className="chat">
       <div className="top">
         <div className="user">
-          <img src="./avatar.png" alt="" />
+          <div
+            className="avatar"
+            style={{
+              width: "50px",
+              height: "50px",
+              borderRadius: "50%",
+              backgroundColor: "#5183fe", // Change this dynamically if needed
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "white",
+              fontSize: "20px",
+            }}
+          >
+            {firstChar}
+          </div>
           <div className="texts">
-            <span>Jane Doe</span>
+            <span>{user?.username}</span>
             <p>Lorem Ipsum Doler smit, mujhika iddppoi.</p>
           </div>
         </div>
@@ -100,18 +118,28 @@ const Chat = () => {
         </div>
       </div>
       <div className="center">
-        {chat?.messages?.map((message) => (
-          <div className={
-            message.senderId === currentUser.id
-             ? "message own"
-              : "message"
-          } key={message?.createdAt}>
-            <div className="texts">
-              <p>{message.text}</p>
-              <span>1 min ago</span>
+        {chat?.messages?.map((message) => {
+          const timeAgo = message.createdAt
+            ? formatDistanceToNow(message.createdAt.toDate(), {
+                addSuffix: true,
+              })
+            : "Just now";
+
+          return (
+            <div
+              className={
+                message.senderId === currentUser.id ? "message own" : "message"
+              }
+              key={message?.createdAt}
+            >
+              <div className="texts">
+                <p>{message.text}</p>
+                <span>{timeAgo}</span> {/* Show formatted time */}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
+
         <div ref={endRef}></div>
       </div>
       <div className="bottom">
@@ -122,9 +150,14 @@ const Chat = () => {
         </div>
         <input
           type="text"
-          placeholder="Type a message..."
+          placeholder={
+            isCurrentUserBlocked || isReceiverBlocked
+              ? "You cannot send a message"
+              : "Type a message..."
+          }
           onChange={(e) => setText(e.target.value)}
           value={text}
+          disabled={isCurrentUserBlocked || isReceiverBlocked}
         />
         <div className="emoji">
           <img
@@ -136,7 +169,11 @@ const Chat = () => {
             <EmojiPicker open={open} onEmojiClick={handelEmoji} />
           </div>
         </div>
-        <button className="sendButton" onClick={handleSend}>
+        <button
+          className="sendButton"
+          onClick={handleSend}
+          disabled={isCurrentUserBlocked || isReceiverBlocked}
+        >
           Send
         </button>
       </div>

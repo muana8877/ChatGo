@@ -9,6 +9,8 @@ import { useChatStore } from "../../../lib/chatStore";
 const ChatList = () => {
   const [chats, setChats] = useState([]);
   const [addMode, setAddMode] = useState(false);
+  const [input, setInput] = useState("");
+
   const { currentUser } = useUserStore();
   const { chatId, changeChat } = useChatStore();
 
@@ -62,12 +64,20 @@ const ChatList = () => {
       console.log(err);
     }
   };
+
+  const filteredChats = chats.filter((c) =>
+    c.user.username.toLowerCase().includes(input.toLowerCase())
+  );
   return (
     <div className="chatList">
       <div className="search">
         <div className="searchBar">
           <img src="./search.png" alt="" />
-          <input type="text" placeholder="search" />
+          <input
+            type="text"
+            placeholder="search"
+            onChange={(e) => setInput(e.target.value)}
+          />
         </div>
         <img
           className="add"
@@ -76,26 +86,52 @@ const ChatList = () => {
           onClick={() => setAddMode((prev) => !prev)}
         />
       </div>
-      {chats.map((chat) => (
-        <div
-          className="item"
-          key={chat.chatId}
-          onClick={() => handleSelect(chat)}
-          style={{
-            backgroundColor: chat?.isSeen ? "transparent" : "#5183fe",
-          }}
-        >
-          <img src="./avatar.png" alt="" />
-          <div className="texts">
-            <span>{chat.user.username}</span>
-            <p>
-              {chat.lastMessage.length > 25
-                ? chat.lastMessage.substring(0, 25) + "..."
-                : chat.lastMessage}
-            </p>
+
+      {filteredChats.map((chat) => {
+        const firstChar = chat?.user?.username?.charAt(0).toUpperCase() || "?";
+
+        return (
+          <div
+            className="item"
+            key={chat.chatId}
+            onClick={() => handleSelect(chat)}
+            style={{
+              backgroundColor: chat?.isSeen ? "transparent" : "#5183fe",
+            }}
+          >
+            <div
+              className="avatar"
+              style={{
+                width: "50px",
+                height: "50px",
+                borderRadius: "50%",
+                backgroundColor: "#5183fe", // You can make this dynamic
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "white",
+                fontSize: "20px",
+                fontWeight: "bold",
+              }}
+            >
+              {firstChar}
+            </div>
+            <div className="texts">
+              <span>
+                {chat.user.blocked.includes(currentUser.id)
+                  ? "User"
+                  : chat.user.username}
+              </span>
+              <p>
+                {chat.lastMessage.length > 25
+                  ? chat.lastMessage.substring(0, 25) + "..."
+                  : chat.lastMessage}
+              </p>
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
+
       {addMode && <AddUser />}
     </div>
   );

@@ -65,6 +65,7 @@ const AddUser = () => {
       console.error(err);
     }
   }
+  const firstChar = user?.username?.charAt(0).toUpperCase() || "?";
   return (
     <div className="addUser">
       <form onSubmit={handleSearch}>
@@ -73,7 +74,23 @@ const AddUser = () => {
       </form>
       {user && <div className="user">
         <div className="detail">
-          <img src="./avatar.png" alt="" />
+        <div
+              className="avatar"
+              style={{
+                width: "50px",
+                height: "50px",
+                borderRadius: "50%",
+                backgroundColor: "#5183fe", // You can make this dynamic
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "white",
+                fontSize: "20px",
+                fontWeight: "bold",
+              }}
+            >
+              {firstChar}
+            </div>
           <span>{user.username}</span>
         </div>
         <button onClick={handleAdd}>Add User</button>

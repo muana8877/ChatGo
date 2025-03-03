@@ -1,13 +1,53 @@
 import React from "react";
 import "./detail.css";
 import { auth } from "../../lib/firebase";
+import { db } from "../../lib/firebase";
+import { useChatStore } from "../../lib/chatStore";
+import { useUserStore } from "../../lib/userStore";
+import { arrayRemove, arrayUnion, doc, updateDoc } from "firebase/firestore";
 
 const Detail = () => {
+  const { chatId, user, isCurrentUserBlocked, isReceiverBlocked, changeBlock } =
+    useChatStore();
+
+  const { currentUser } = useUserStore();
+  const handleBlock = async () => {
+    if (!user) return;
+
+    const userDocRef = doc(db, "users", currentUser.id);
+
+    try {
+      await updateDoc(userDocRef, {
+        blocked: isReceiverBlocked ? arrayRemove(user.id) : arrayUnion(user.id),
+      });
+      changeBlock();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  const firstChar = user?.username?.charAt(0).toUpperCase() || "?";
   return (
     <div className="detail">
       <div className="user">
-        <img src="./avatar.png" alt="Avatar" />
-        <h2>Jane Doe</h2>
+        <div
+          className="avatar"
+          style={{
+            width: "100px",
+            height: "100px",
+            borderRadius: "50%",
+            backgroundColor: "#5183fe", // Change this dynamically if needed
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "white",
+            fontSize: "50px",
+            fontWeight: "bold",
+          }}
+        >
+          {firstChar}
+        </div>
+
+        <h2>{user?.username}</h2>
         <p>Lorem ipsum dolor sit amet.</p>
       </div>
       <div className="info">
@@ -23,46 +63,23 @@ const Detail = () => {
             <img src="./arrowUp.png" alt="" />
           </div>
         </div>
-        <div className="option">
-          <div className="title">
-            <span>Shared Photos</span>
-            <img src="./arrowDown.png" alt="" />
-          </div>
-          <div className="photos">
-            <div className="photoItem">
-              <div className="photoDetail">
-                <img src="./bg.jpg" alt="" />
-                <span>photo_2025.png</span>
-              </div>
-              <img src="./download.png" className="icon" alt="" />
-            </div>
-            <div className="photoItem">
-              <div className="photoDetail">
-                <img src="./bg.jpg" alt="" />
-                <span>photo_2025.png</span>
-              </div>
-              <img src="./download.png" className="icon" alt="" />
-            </div>
-            <div className="photoItem">
-              <div className="photoDetail">
-                <img src="./bg.jpg" alt="" />
-                <span>photo_2025.png</span>
-              </div>
-              <img src="./download.png" className="icon" alt="" />
-            </div>
-          </div>
-        </div>
-        <div className="option">
-          <div className="title">
-            <span>Shared Files</span>
-            <img src="./arrowUp.png" alt="" />
-          </div>
-        </div>
-        <button>Block User</button>
-        <button className="logout" onClick={() => {
-          auth.signOut();
-          console.log("Logout btn clicked")
-        }}>Logout</button>
+
+        <button onClick={handleBlock}>
+          {isCurrentUserBlocked
+            ? "You are Blocked!"
+            : isReceiverBlocked
+            ? "User Blocked"
+            : "Block User"}
+        </button>
+        <button
+          className="logout"
+          onClick={() => {
+            auth.signOut();
+            console.log("Logout btn clicked");
+          }}
+        >
+          Logout
+        </button>
       </div>
     </div>
   );
