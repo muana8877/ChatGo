@@ -6,7 +6,7 @@ import { useChatStore } from "../../lib/chatStore";
 import { useUserStore } from "../../lib/userStore";
 import { arrayRemove, arrayUnion, doc, updateDoc } from "firebase/firestore";
 
-const Detail = () => {
+const Detail = ({ showDetail, setShowDetail }) => {
   const { chatId, user, isCurrentUserBlocked, isReceiverBlocked, changeBlock } =
     useChatStore();
 
@@ -27,7 +27,14 @@ const Detail = () => {
   };
   const firstChar = user?.username?.charAt(0).toUpperCase() || "?";
   return (
-    <div className="detail">
+    <div className={`detail ${showDetail ? "open" : ""}`}>
+      <button
+        className="closeDetail"
+        onClick={() => setShowDetail && setShowDetail(false)}
+        aria-label="Close details"
+      >
+        ×
+      </button>
       <div className="user">
         <div
           className="avatar"

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import List from "./components/list/list";
 import Chat from "./components/chat/Chat";
 import Detail from "./components/detail/detail";
@@ -13,6 +13,15 @@ const App = () => {
   
   const {currentUser, isLoading, fetchUserInfo} = useUserStore()
   const { chatId } = useChatStore();
+  // show sidebar by default on larger screens, hide on small screens
+  const [showSidebar, setShowSidebar] = useState(() => {
+    try {
+      return window.innerWidth > 900;
+    } catch (e) {
+      return true;
+    }
+  });
+  const [showDetail, setShowDetail] = useState(false);
 
   useEffect(()=>{
     const unSub = onAuthStateChanged(auth, (user) =>{
@@ -32,9 +41,14 @@ const App = () => {
     <div className="container">
       {currentUser ? (
         <>
-          <List />
-          {chatId && <Chat />}
-          {chatId && <Detail />}
+          <List showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
+          {chatId && (
+            <Chat
+              toggleSidebar={() => setShowSidebar((s) => !s)}
+              toggleDetail={() => setShowDetail((s) => !s)}
+            />
+          )}
+          {chatId && <Detail showDetail={showDetail} setShowDetail={setShowDetail} />}
         </>
       ) : (
         <Login />

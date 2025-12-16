@@ -12,7 +12,7 @@ import {
 import { db } from "../../lib/firebase";
 import { useChatStore } from "../../lib/chatStore";
 import { useUserStore } from "../../lib/userStore";
-const Chat = () => {
+const Chat = ({ toggleSidebar, toggleDetail }) => {
   const [chat, setChat] = useState();
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
@@ -89,6 +89,9 @@ const Chat = () => {
   return (
     <div className="chat">
       <div className="top">
+        <button className="hamburger" onClick={toggleSidebar} aria-label="Open sidebar">
+          ☰
+        </button>
         <div className="user">
           <div
             className="avatar"
@@ -114,7 +117,7 @@ const Chat = () => {
         <div className="icons">
           <img src="./phone.png" alt="" />
           <img src="video.png" alt="" />
-          <img src="info.png" alt="" />
+          <img src="info.png" alt="" onClick={toggleDetail} style={{cursor: 'pointer'}} />
         </div>
       </div>
       <div className="center">

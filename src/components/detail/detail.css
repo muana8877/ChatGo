@@ -1,6 +1,7 @@
 .detail {
   flex: 1;
-  overflow: scroll;
+  min-width: 0;
+  overflow: auto;
   .user {
     padding: 10px 20px;
     display: flex;
@@ -94,3 +95,40 @@
 .detail::-webkit-scrollbar{
     display: none;
 }
+
+@media (max-width: 900px){
+  /* Hide detail panel on small screens by default; allow open state as overlay */
+  .detail{
+    display: none;
+  }
+
+  .detail.open{
+    display: block;
+    position: fixed;
+    right: 0;
+    top: 0;
+    height: 100vh;
+    width: 80%;
+    max-width: 380px;
+    background: rgba(17, 25, 40, 0.95);
+    z-index: 50;
+    box-shadow: -6px 0 20px rgba(0,0,0,0.6);
+    transform: translateX(0);
+    overflow-y: auto;
+    padding-top: 16px;
+  }
+
+  .detail .closeDetail{
+    display: block;
+    position: absolute;
+    left: 8px;
+    top: 8px;
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 28px;
+    cursor: pointer;
+    z-index: 60;
+  }
+}
+.closeDetail{ display: none; }

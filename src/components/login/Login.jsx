@@ -22,8 +22,9 @@ const Login = () => {
 
       await signInWithEmailAndPassword(auth,email, password);
       toast.success("Logged In Successfully!");
-      // Redirect to chat
-      // history.push("/");
+      // Redirect to dashboard (update URL only, don't reload)
+      // Rely on auth-driven rendering in App.jsx to show the dashboard.
+      window.history.pushState({}, '', '/dashboard');
     }
     catch(err){
       console.error(err);
@@ -34,26 +35,74 @@ const Login = () => {
     }
   };
 
-  const handleRegister = async (e) =>{
-    e.preventDefault();
-    setLoading(true)
-    const formData = new FormData(e.target)
-    const {username,email,password}  = Object.fromEntries(formData);
+  // const handleRegister = async (e) =>{
+  //   e.preventDefault();
+  //   setLoading(true)
+  //   const formData = new FormData(e.target)
+  //   const {username,email,password}  = Object.fromEntries(formData);
 
-    // VALIDATE INPUTS
-    if (!username || !email || !password)
+  //   // VALIDATE INPUTS
+  //   if (!username || !email || !password)
+  //     return toast.warn("Please enter inputs!");
+  //   // VALIDATE UNIQUE USERNAME
+  //   const usersRef = collection(db, "users");
+  //   const q = query(usersRef, where("username", "==", username));
+  //   const querySnapshot = await getDocs(q);
+  //   if (!querySnapshot.empty) {
+  //     return toast.warn("Select another username");
+  //   }
+
+  //   try{
+  //     const res = await createUserWithEmailAndPassword(auth,email,password);
+
+  //     await setDoc(doc(db, "users", res.user.uid), {
+  //       username,
+  //       email,
+  //       id: res.user.uid,
+  //       blocked: [],
+  //     });
+
+  //     await setDoc(doc(db, "userchats", res.user.uid), {
+  //       chats: [],
+  //     });
+
+  //     toast.success("Acount created!");
+
+  //     // Redirect to chat
+  //     // history.push("/");
+  //   }catch(err){
+  //     console.error(err);
+  //     toast.error(err.message);
+  //   }
+  // }
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const formData = new FormData(e.target);
+    const { username, email, password } = Object.fromEntries(formData);
+
+    if (!username || !email || !password) {
+      setLoading(false);
       return toast.warn("Please enter inputs!");
-    // VALIDATE UNIQUE USERNAME
-    const usersRef = collection(db, "users");
-    const q = query(usersRef, where("username", "==", username));
-    const querySnapshot = await getDocs(q);
-    if (!querySnapshot.empty) {
-      return toast.warn("Select another username");
     }
 
-    try{
-      const res = await createUserWithEmailAndPassword(auth,email,password);
+    try {
+      // 1️⃣ Create auth user FIRST
+      const res = await createUserWithEmailAndPassword(auth, email, password);
 
+      // 2️⃣ Check username uniqueness AFTER auth
+      const usersRef = collection(db, "users");
+      const q = query(usersRef, where("username", "==", username));
+      const querySnapshot = await getDocs(q);
+
+      if (!querySnapshot.empty) {
+        toast.warn("Select another username");
+        return;
+      }
+
+      // 3️⃣ Write user data
       await setDoc(doc(db, "users", res.user.uid), {
         username,
         email,
@@ -65,15 +114,16 @@ const Login = () => {
         chats: [],
       });
 
-      toast.success("Acount created!");
+      toast.success("Account created!");
 
-      // Redirect to chat
-      // history.push("/");
-    }catch(err){
+    } catch (err) {
       console.error(err);
       toast.error(err.message);
+    } finally {
+      setLoading(false);
     }
-  }
+  };
+
   
   return (
     <div className="login">

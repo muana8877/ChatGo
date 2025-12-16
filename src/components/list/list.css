@@ -2,4 +2,84 @@
     flex: 1;
     display:flex ;
     flex-direction: column;
+    position: relative;
+    transition: transform 0.25s ease-in-out;
+}
+
+/* Mobile responsive: hide by default and use overlay when opened */
+/* Mobile: default hidden, open shows overlay */
+@media (max-width: 900px){
+    .list{
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 80%;
+        max-width: 320px;
+        background: rgba(10,12,20,0.95);
+        z-index: 40;
+        box-shadow: 2px 0 12px rgba(0,0,0,0.5);
+        overflow-y: auto;
+        transform: translateX(-100%);
+    }
+
+    .list.open{
+        display: block;
+        transform: translateX(0);
+    }
+
+    .closeSidebar{
+        display: block;
+        background: transparent;
+        border: none;
+        color: white;
+        font-size: 28px;
+        padding: 10px 16px;
+        cursor: pointer;
+        align-self: flex-end;
+    }
+}
+
+.sidebarOverlay{
+    display: none;
+}
+
+@media (max-width: 900px){
+    .sidebarOverlay{
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background: rgba(0,0,0,0.45);
+        z-index: 30;
+    }
+}
+
+/* Desktop: hide close button if present */
+@media (min-width: 901px){
+    .closeSidebar{ display: none; }
+}
+
+/* Desktop: support collapsed/overlay behavior when not open */
+@media (min-width: 901px){
+    /* when not open, move the sidebar out of flow as an overlay */
+    .list{
+        transform: translateX(0);
+        position: relative;
+    }
+
+    .list:not(.open){
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 280px;
+        transform: translateX(-100%);
+        z-index: 40;
+        box-shadow: 2px 0 12px rgba(0,0,0,0.4);
+        background: rgba(10,12,20,0.95);
+        display: block;
+    }
 }
