@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import List from "./components/List/List";
 import Chat from "./components/chat/Chat";
 import Detail from "./components/detail/Detail";
 import Login from "./components/login/Login";
+import EmptyChat from "./components/emptyChat/EmptyChat";
 import Notifications from "./components/notification/Notification";
 import { onAuthStateChanged } from "firebase/auth";
-import {auth, db} from "./lib/firebase";
+import { auth } from "./lib/firebase";
 import { useUserStore } from "./lib/userStore";
-import {useChatStore  } from "./lib/chatStore";
+import { useChatStore } from "./lib/chatStore";
 
 const App = () => {
   
@@ -34,21 +35,23 @@ const App = () => {
     }
   }, [fetchUserInfo]);
 
-  console.log(currentUser)
-
   if (isLoading) return <div className="loading">Loading...</div>;
   return (
     <div className="container">
       {currentUser ? (
         <>
           <List showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
-          {chatId && (
-            <Chat
-              toggleSidebar={() => setShowSidebar((s) => !s)}
-              toggleDetail={() => setShowDetail((s) => !s)}
-            />
+          {chatId ? (
+            <>
+              <Chat
+                toggleSidebar={() => setShowSidebar((s) => !s)}
+                toggleDetail={() => setShowDetail((s) => !s)}
+              />
+              <Detail showDetail={showDetail} setShowDetail={setShowDetail} />
+            </>
+          ) : (
+            <EmptyChat />
           )}
-          {chatId && <Detail showDetail={showDetail} setShowDetail={setShowDetail} />}
         </>
       ) : (
         <Login />

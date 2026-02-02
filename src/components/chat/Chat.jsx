@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import EmojiPicker from "emoji-picker-react";
 import "./chat.css";
 import { formatDistanceToNow } from "date-fns";
@@ -12,6 +12,7 @@ import {
 import { db } from "../../lib/firebase";
 import { useChatStore } from "../../lib/chatStore";
 import { useUserStore } from "../../lib/userStore";
+import Avatar from "../common/Avatar";
 const Chat = ({ toggleSidebar, toggleDetail }) => {
   const [chat, setChat] = useState();
   const [open, setOpen] = useState(false);
@@ -37,7 +38,7 @@ const Chat = ({ toggleSidebar, toggleDetail }) => {
     };
   }, [chatId]);
 
-  const handelEmoji = (e) => {
+  const handleEmoji = (e) => {
     setText((prev) => prev + e.emoji);
     setOpen(false);
   };
@@ -78,14 +79,12 @@ const Chat = ({ toggleSidebar, toggleDetail }) => {
         }
       });
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
 
     setText("");
   };
 
-  console.log(text);
-  const firstChar = user?.username?.charAt(0).toUpperCase() || "?";
   return (
     <div className="chat">
       <div className="top">
@@ -93,25 +92,10 @@ const Chat = ({ toggleSidebar, toggleDetail }) => {
           ☰
         </button>
         <div className="user">
-          <div
-            className="avatar"
-            style={{
-              width: "50px",
-              height: "50px",
-              borderRadius: "50%",
-              backgroundColor: "#5183fe", // Change this dynamically if needed
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "white",
-              fontSize: "20px",
-            }}
-          >
-            {firstChar}
-          </div>
+          <Avatar username={user?.username} size="medium" />
           <div className="texts">
             <span>{user?.username}</span>
-            <p>Lorem Ipsum Doler smit, mujhika iddppoi.</p>
+            <p>{isCurrentUserBlocked ? "User unavailable" : "Online"}</p>
           </div>
         </div>
         <div className="icons">
@@ -169,7 +153,7 @@ const Chat = ({ toggleSidebar, toggleDetail }) => {
             onClick={() => setOpen((prev) => !prev)}
           />
           <div className="picker">
-            <EmojiPicker open={open} onEmojiClick={handelEmoji} />
+            <EmojiPicker open={open} onEmojiClick={handleEmoji} />
           </div>
         </div>
         <button

@@ -1,16 +1,16 @@
-import React from "react";
 import "./detail.css";
-import { auth } from "../../lib/firebase";
-import { db } from "../../lib/firebase";
+import { auth, db } from "../../lib/firebase";
 import { useChatStore } from "../../lib/chatStore";
 import { useUserStore } from "../../lib/userStore";
 import { arrayRemove, arrayUnion, doc, updateDoc } from "firebase/firestore";
+import Avatar from "../common/Avatar";
 
 const Detail = ({ showDetail, setShowDetail }) => {
-  const { chatId, user, isCurrentUserBlocked, isReceiverBlocked, changeBlock } =
+  const { user, isCurrentUserBlocked, isReceiverBlocked, changeBlock } =
     useChatStore();
 
   const { currentUser } = useUserStore();
+
   const handleBlock = async () => {
     if (!user) return;
 
@@ -22,10 +22,10 @@ const Detail = ({ showDetail, setShowDetail }) => {
       });
       changeBlock();
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   };
-  const firstChar = user?.username?.charAt(0).toUpperCase() || "?";
+
   return (
     <div className={`detail ${showDetail ? "open" : ""}`}>
       <button
@@ -36,26 +36,9 @@ const Detail = ({ showDetail, setShowDetail }) => {
         ×
       </button>
       <div className="user">
-        <div
-          className="avatar"
-          style={{
-            width: "100px",
-            height: "100px",
-            borderRadius: "50%",
-            backgroundColor: "#5183fe", // Change this dynamically if needed
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: "white",
-            fontSize: "50px",
-            fontWeight: "bold",
-          }}
-        >
-          {firstChar}
-        </div>
-
+        <Avatar username={user?.username} size="large" />
         <h2>{user?.username}</h2>
-        <p>Lorem ipsum dolor sit amet.</p>
+        <p>{isCurrentUserBlocked ? "This user has blocked you" : "Chat member"}</p>
       </div>
       <div className="info">
         <div className="option">
@@ -80,10 +63,7 @@ const Detail = ({ showDetail, setShowDetail }) => {
         </button>
         <button
           className="logout"
-          onClick={() => {
-            auth.signOut();
-            console.log("Logout btn clicked");
-          }}
+          onClick={() => auth.signOut()}
         >
           Logout
         </button>

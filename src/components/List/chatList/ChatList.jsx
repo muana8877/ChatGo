@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import "./chatList.css";
 import AddUser from "./addUser/AddUser";
+import Avatar from "../../common/Avatar";
 import { useUserStore } from "../../../lib/userStore";
 import { onSnapshot, doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
@@ -12,9 +13,7 @@ const ChatList = () => {
   const [input, setInput] = useState("");
 
   const { currentUser } = useUserStore();
-  const { chatId, changeChat } = useChatStore();
-
-  console.log(chatId);
+  const { changeChat } = useChatStore();
 
   useEffect(() => {
     const unSub = onSnapshot(
@@ -22,7 +21,7 @@ const ChatList = () => {
       async (res) => {
         const items = res.data().chats;
 
-        const promisses = items.map(async (item) => {
+        const promises = items.map(async (item) => {
           const userDocRef = doc(db, "users", item.receiverId);
           const userDocSnap = await getDoc(userDocRef);
 
@@ -31,9 +30,9 @@ const ChatList = () => {
           return { ...item, user };
         });
 
-        const chatData = await Promise.all(promisses);
+        const chatData = await Promise.all(promises);
 
-        setChats(chatData.sort((a, b) => b.updated_at - a.updated_at));
+        setChats(chatData.sort((a, b) => b.updatedAt - a.updatedAt));
       }
     );
     return () => {
@@ -61,13 +60,14 @@ const ChatList = () => {
       });
       changeChat(chat.chatId, chat.user);
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   };
 
   const filteredChats = chats.filter((c) =>
     c.user.username.toLowerCase().includes(input.toLowerCase())
   );
+
   return (
     <div className="chatList">
       <div className="search">
@@ -75,7 +75,7 @@ const ChatList = () => {
           <img src="./search.png" alt="" />
           <input
             type="text"
-            placeholder="search"
+            placeholder="Search"
             onChange={(e) => setInput(e.target.value)}
           />
         </div>
@@ -88,7 +88,9 @@ const ChatList = () => {
       </div>
 
       {filteredChats.map((chat) => {
-        const firstChar = chat?.user?.username?.charAt(0).toUpperCase() || "?";
+        const displayName = chat.user.blocked.includes(currentUser.id)
+          ? "User"
+          : chat.user.username;
 
         return (
           <div
@@ -99,29 +101,9 @@ const ChatList = () => {
               backgroundColor: chat?.isSeen ? "transparent" : "#5183fe",
             }}
           >
-            <div
-              className="avatar"
-              style={{
-                width: "50px",
-                height: "50px",
-                borderRadius: "50%",
-                backgroundColor: "#5183fe", // You can make this dynamic
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "white",
-                fontSize: "20px",
-                fontWeight: "bold",
-              }}
-            >
-              {firstChar}
-            </div>
+            <Avatar username={displayName} size="medium" />
             <div className="texts">
-              <span>
-                {chat.user.blocked.includes(currentUser.id)
-                  ? "User"
-                  : chat.user.username}
-              </span>
+              <span>{displayName}</span>
               <p>
                 {chat.lastMessage.length > 25
                   ? chat.lastMessage.substring(0, 25) + "..."
